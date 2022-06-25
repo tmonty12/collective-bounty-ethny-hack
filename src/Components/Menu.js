@@ -13,9 +13,9 @@ function Menu({connectBtnText, setConnectBtnText}) {
   const createBountyButton = () => {
     if (connectBtnText !== 'Connect Wallet') {
       return (
-      <Nav.Link to="/bounty/create">
+      <Link to ="/bounty/create" className="nav-link" >
         <Button onClick={requestAccount}>Create Bounty</Button>
-      </Nav.Link>);
+      </Link>);
     }
   }
 
@@ -23,7 +23,9 @@ function Menu({connectBtnText, setConnectBtnText}) {
     <>
       <Navbar bg="light" variant="light">
         <Container>
-          <Navbar.Brand>Name here</Navbar.Brand>
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <Navbar.Brand>Name here</Navbar.Brand>
+          </Link>
           <Nav>
             {createBountyButton()}
             <Nav.Link>

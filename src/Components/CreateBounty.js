@@ -1,27 +1,35 @@
 import { Container, Form, Card, Button } from 'react-bootstrap'
-import ConnectWallet from './ConnectWallet';
+import ConnectWallet from './ConnectWallet'
 import { useState } from 'react'
+import { ethers } from 'ethers'
+import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
+
+const bountyFactoryAddress = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
 
 function CreateBounty({connectBtnText, chainId}) {
     const [request, setRequest] = useState('')
     const [date, setDate] = useState(0)
     const [time, setTime] = useState(0)
-    const [stake, setStake] = useState(0)
+    const [stake, setStake] = useState(1)
 
 
-    const onSubmitForm = (e) => {
+    const onSubmitForm = async (e) => {
         e.preventDefault()
 
         const deadlineTime = Date.parse(date + ' ' + time);
         const currentTime = Date.now()
-        console.log(deadlineTime, currentTime)
-        console.log((deadlineTime-currentTime)/60000)
+        const timeToDeadline = Math.floor((deadlineTime-currentTime)/60000)
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
+        const bountyFactory = new ethers.Contract(bountyFactoryAddress, BountyFactory.abi, signer)
+        await bountyFactory.createBounty(request, timeToDeadline, {value: ethers.utils.parseEther(stake.toString())})
     }
 
     return (
         <Container>
             <ConnectWallet connectBtnText={connectBtnText} chainId={chainId}>
-                <Card>
+                <Card style={{ marginTop: '20px' }}>
                     <Card.Body>
                         <Card.Title>Create Bounty Form</Card.Title>
                         <Form onSubmit={onSubmitForm}>

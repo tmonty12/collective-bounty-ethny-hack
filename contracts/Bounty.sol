@@ -4,15 +4,15 @@ pragma solidity ^0.8.7;
 //import "./PriceConverter.sol";
 
 contract Bounty {
-    //using PriceConverter for uint256;
-    // stake, vote, upload
-    // Create an array
     videoInfo[] public videos;
     address[] stakers;
     uint256 minStakeAmount = 0;
+
+    string public request;
+    uint deadline;
     // Video Address/String -> Struct of Video Information - for Vote Addresses
     // Staked Address -> Amount Staked
-    mapping(address => uint256) public addressToAmount;
+    mapping(address => uint256) public amountStaked;
     // money sent to creator address
     address winnerAddr = 0x09FD51F989179a4B04d318F8ae76CFD22c447515;
 
@@ -22,6 +22,11 @@ contract Bounty {
         string assetLink;
     }
 
+    constructor(string memory _request, uint _deadlineTime) {
+        request = _request;
+        deadline = block.timestamp + _deadlineTime;
+    }
+
     function stake() public payable {
         // msg.value == staked amount, need to convert this to minstake
         require(
@@ -29,7 +34,7 @@ contract Bounty {
             "You must stake atleast the original stake in order to join this bounty!"
         );
         stakers.push(msg.sender);
-        addressToAmount[msg.sender] = msg.value;
+        amountStaked[msg.sender] = msg.value;
     }
 
     function withdraw() public payable {
