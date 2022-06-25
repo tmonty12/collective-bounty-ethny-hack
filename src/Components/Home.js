@@ -1,32 +1,14 @@
-import Menu from './Menu.js'
+import ConnectWallet from './ConnectWallet'
 import Container from 'react-bootstrap/Container'
 
-function Home({ connectBtnText, setConnectBtnText, chainId }) {
-    const localhostChainId = '0x539';
-
-    const renderHome = () => {
-        if (connectBtnText === 'Connect Wallet') {
-            return (
-                <h1>Please Connect Wallet</h1>
-            )
-        } else if (chainId !== localhostChainId) {
-            return (
-                <h1>Please Connect to localhost</h1>
-            )
-        } else {
-            return (
-                <h1>Welcome Home</h1>
-            )
-        }
-    }
+function Home({ connectBtnText, chainId }) {
 
     return (
-        <>
-            <Menu connectBtnText={connectBtnText} setConnectBtnText={setConnectBtnText} />
-            <Container>
-                {renderHome()}
-            </Container>
-        </>
+        <Container>
+            <ConnectWallet connectBtnText={connectBtnText} chainId={chainId}>
+                <div>Welcome Home</div>
+            </ConnectWallet>
+        </Container>
     )
 }
 

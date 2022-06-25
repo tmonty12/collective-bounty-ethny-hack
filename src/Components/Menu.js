@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
 import { Button, Container, Navbar, Nav } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 
 function Menu({connectBtnText, setConnectBtnText}) {
   function requestAccount() {
@@ -13,7 +13,7 @@ function Menu({connectBtnText, setConnectBtnText}) {
   const createBountyButton = () => {
     if (connectBtnText !== 'Connect Wallet') {
       return (
-      <Nav.Link>
+      <Nav.Link to="/bounty/create">
         <Button onClick={requestAccount}>Create Bounty</Button>
       </Nav.Link>);
     }
