@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ethers } from 'ethers'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
 
-const bountyFactoryAddress = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
+const bountyFactoryAddress = '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
 
 function CreateBounty({connectBtnText, chainId}) {
     const [request, setRequest] = useState('')

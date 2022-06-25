@@ -1,7 +1,12 @@
 import { Button, Container, Navbar, Nav } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
 
 function Menu({connectBtnText, setConnectBtnText}) {
+  useEffect(() => {
+    requestAccount()
+  }, [])
+  
   function requestAccount() {
     window.ethereum.request({ method: 'eth_requestAccounts' })
       .then(async (accounts) => {

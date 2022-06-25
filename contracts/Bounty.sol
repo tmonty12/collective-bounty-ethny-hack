@@ -9,7 +9,7 @@ contract Bounty {
     uint256 minStakeAmount = 0;
 
     string public request;
-    uint deadline;
+    uint public deadline;
     // Video Address/String -> Struct of Video Information - for Vote Addresses
     // Staked Address -> Amount Staked
     mapping(address => uint256) public amountStaked;
