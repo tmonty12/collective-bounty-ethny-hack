@@ -1,19 +1,18 @@
-import { Container, Stack, Form, Button, Card } from 'react-bootstrap'
+import { Container, Stack, Form, Button } from 'react-bootstrap'
 import ConnectWallet from './ConnectWallet';
+import Videos from './Videos';
 import { useEffect, useState } from 'react'
 import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
 import { ethers, utils } from 'ethers';
 import { useParams } from 'react-router-dom';
 
-const bountyFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
-
-function BountyHomepage ({connectBtnText, chainId}) {
-    const [bountyDisplay, setBountyDisplay] = useState(<div></div>)
-    const [bountyAddress, setBountyAddress] = useState("")
     const [staking, setStaking] = useState(false)
     const [stake, setStake] = useState(1)
     const [staked, setStaked] = useState(false)
+    const [uploading, setUploading] = useState(false)
+    const [uploaded, setUploaded] = useState(false)
+    const [link, setLink] = useState("")
 
     const {index} = useParams()
 
@@ -41,6 +40,20 @@ function BountyHomepage ({connectBtnText, chainId}) {
             console.log(stakers)
         }
         })
+
+        // check if uploaded a video
+        const videoObjects = await bounty.getVideos()
+        for (let i=0; i < videoObjects.length; i++) {
+            window.ethereum.request({ method: "eth_accounts" })
+            .then(async (accounts) => {
+            if (accounts.length !== 0) {
+                const currentAddress = utils.getAddress(accounts[0]);
+                if (videoObjects[i].submissionAddr == currentAddress) {
+                    setUploaded(true)
+                }
+            }
+            })
+        }
         
         setBountyDisplay(
             <div>
@@ -51,7 +64,7 @@ function BountyHomepage ({connectBtnText, chainId}) {
         )
     }
 
-    const onSubmitForm = async (e) => {
+    const onSubmitStakeForm = async (e) => {
         e.preventDefault()
 
         const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -62,19 +75,32 @@ function BountyHomepage ({connectBtnText, chainId}) {
         window.location.reload()
     }
 
+    const onSubmitVideoForm = async (e) => {
+        e.preventDefault()
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
+        const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
+        const createVideo = await bounty.upload(link)
+        await createVideo.wait()
+        setUploaded(true)
+        // window.location.reload()
+    }
+
     function body() {
         if (staked) {
             return (
                 <div>
                     <h3>Already staked!</h3>
                     <p>Here are all the videos</p>
+                    <Videos bountyAddress={bountyAddress} />
                 </div>
             )
         }
         else if (staking) {
             return (
-            <Form onSubmit={onSubmitForm}>
-                <Form.Group className="mb-3" controlId="request">
+            <Form onSubmit={onSubmitStakeForm}>
+                <Form.Group className="mb-3" controlId="stake request">
                         <Form.Label>Amount to stake</Form.Label>
                         <Form.Control type="number" value={stake} onChange={({target}) => setStake(target.value)}></Form.Control>
                 </Form.Group>
@@ -83,11 +109,26 @@ function BountyHomepage ({connectBtnText, chainId}) {
                     <Button onClick={() => setStaking(false)}>Back</Button>
                 </Stack>
             </Form>)
-        } else {
+        } else if (uploaded) {
+            return <h3>Successfully uploaded!</h3>
+        } else if (uploading) {
+            return ( <Form onSubmit={onSubmitVideoForm}>
+                <Form.Group className="mb-3" controlId="video request">
+                        <Form.Label>Link to video</Form.Label>
+                        <Form.Control type="text" value={link} onChange={({target}) => setLink(target.value)}></Form.Control>
+                </Form.Group>
+                <Stack direction="horizontal" gap={3}>
+                    <Button type="submit">Submit</Button>
+                    <Button onClick={() => setUploading(false)}>Back</Button>
+                </Stack>
+            </Form>
+           )
+        } 
+        else {
             return (
                 <Stack direction="horizontal" gap={3}>
                     <Button onClick={() => setStaking(true)}>Stake</Button>
-                    <Button>Upload Video</Button>
+                    <Button onClick={() => setUploading(true)}>Upload Video</Button>
                 </Stack>
             )
         }

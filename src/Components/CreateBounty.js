@@ -3,7 +3,6 @@ import ConnectWallet from './ConnectWallet'
 import { useState } from 'react'
 import { ethers } from 'ethers'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
-import { Link } from 'react-router-dom'
 
 const bountyFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
 
