@@ -30,7 +30,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Home connectBtnText={connectBtnText} chainId={chainId} />} />
         <Route path="/bounty/create" element={<CreateBounty connectBtnText={connectBtnText} chainId={chainId}/>}/>
-        <Route path="/bounty/:id/upload" element={<VideoUpload connectBtnText={connectBtnText} chainId={chainId}/>}/>
         <Route path="/bounty/:index" element={<BountyHomepage connectBtnText={connectBtnText} chainId={chainId}/>} />
       </Routes>
     </BrowserRouter>

@@ -42,7 +42,7 @@ function VideoUpload({ index, connectBtnText, chainId }){
         });
 
         console.log(selectedVideo)
-        // window.location.reload()
+        window.location.reload()
     }
 
     return (
