@@ -55,7 +55,7 @@ contract Bounty {
             // msg.value == staked amount, need to convert this to minstake
             require(
                 msg.value >= minStakeAmount,
-                "You must stake atleast the original stake in order to join this bounty!"
+                "You must stake at least the original stake in order to join this bounty!"
             );
             stakers.push(msg.sender);
             addressToAmount[msg.sender] = msg.value;
