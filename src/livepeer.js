@@ -12,13 +12,14 @@ const getUploadUrl = async () => {
   return response.json(); // parses JSON response into native JavaScript objects
 }
 
-const uploadVideo = async (requestUrl, formData) => {
+const uploadVideo = async (requestUrl, uploadedVideo) => {
+  
   const response = await fetch(requestUrl, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${api_key}`,
     },
-    body: formData
+    body: uploadedVideo
   })
   return response.json()
 }

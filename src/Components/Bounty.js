@@ -6,7 +6,13 @@ import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
 import { ethers, utils } from 'ethers';
 import { useParams } from 'react-router-dom';
+import VideoUpload from './VideoUpload';
 
+const bountyFactoryAddress = '0x9A676e781A523b5d0C0e43731313A708CB607508'
+
+function BountyHomepage({ connectBtnText, chainId }) {
+    const [bountyDisplay, setBountyDisplay] = useState(<div></div>)
+    const [bountyAddress, setBountyAddress] = useState("")
     const [staking, setStaking] = useState(false)
     const [stake, setStake] = useState(1)
     const [staked, setStaked] = useState(false)
@@ -77,17 +83,6 @@ import { useParams } from 'react-router-dom';
         window.location.reload()
     }
 
-    const onSubmitVideoForm = async (e) => {
-        e.preventDefault()
-
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        const signer = provider.getSigner()
-        const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
-        const createVideo = await bounty.upload(link)
-        await createVideo.wait()
-        window.location.reload()
-    }
-
     const executeContract = async() => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
@@ -123,16 +118,8 @@ import { useParams } from 'react-router-dom';
         } else if (uploaded) {
             return <h3>Successfully uploaded!</h3>
         } else if (uploading) {
-            return ( <Form onSubmit={onSubmitVideoForm}>
-                <Form.Group className="mb-3" controlId="video request">
-                        <Form.Label>Link to video</Form.Label>
-                        <Form.Control type="text" value={link} onChange={({target}) => setLink(target.value)}></Form.Control>
-                </Form.Group>
-                <Stack direction="horizontal" gap={3}>
-                    <Button type="submit">Submit</Button>
-                    <Button onClick={() => setUploading(false)}>Back</Button>
-                </Stack>
-            </Form>
+            return ( 
+                <VideoUpload index={index} connectBtnText={connectBtnText} chainId={chainId} />
            )
         } 
         else {

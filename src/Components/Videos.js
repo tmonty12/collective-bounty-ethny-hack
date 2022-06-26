@@ -33,15 +33,13 @@ function Videos({ bountyAddress }) {
                 const voters = videoObjects[i].voterAddresses
                 voted = voters.includes(currentAddress)
                 setHasVoted(true)
-                console.log(voters)
-                console.log(voted)
             }
             })
             videos.push(
                 <Card style={{ marginTop: '20px' }}>
                     <Card.Body>
                         <Card.Title>
-                            {videoObjects[i].assetLink}
+                            <a href={videoObjects[i].assetLink}>{videoObjects[i].assetLink}</a>
                         </Card.Title>
                         {voted && <Badge bg="success">Voted</Badge>}
                         {!voted && hasVoted && <div>You have already voted for another video.</div>}

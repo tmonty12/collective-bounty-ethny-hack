@@ -7,7 +7,7 @@ import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-const bountyFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
+const bountyFactoryAddress = '0x9A676e781A523b5d0C0e43731313A708CB607508'
 
 function Home({ connectBtnText, chainId }) {
     const [bounties, setBounties] = useState([])
