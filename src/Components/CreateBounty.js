@@ -10,7 +10,7 @@ function CreateBounty({connectBtnText, chainId}) {
     const [request, setRequest] = useState('')
     const [date, setDate] = useState(0)
     const [time, setTime] = useState(0)
-    const [stake, setStake] = useState(1)
+    const [stake, setStake] = useState(0)
 
 
     const onSubmitForm = async (e) => {
