@@ -1,4 +1,5 @@
 import ConnectWallet from './ConnectWallet'
+import BountyHomepage from './Bounty'
 import { Container, Card } from 'react-bootstrap'
 import { ethers } from 'ethers'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
@@ -6,7 +7,7 @@ import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-const bountyFactoryAddress = '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
+const bountyFactoryAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 
 function Home({ connectBtnText, chainId }) {
     const [bounties, setBounties] = useState([])
@@ -50,6 +51,7 @@ function Home({ connectBtnText, chainId }) {
     return (
         <Container>
             <ConnectWallet connectBtnText={connectBtnText} chainId={chainId}>
+                <h1>All Open Bounties</h1>
                 {bounties}
             </ConnectWallet>
         </Container>

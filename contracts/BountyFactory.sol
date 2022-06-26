@@ -8,21 +8,15 @@ contract BountyFactory {
     address[] public bounties;
     uint public numBounties = 0;
 
-    function createBounty(string calldata request, uint deadline) public payable {
-        Bounty newBounty = new Bounty(request, deadline);
-        bounties.push(address(newBounty));
+    function createBounty(string calldata request, uint deadline)
+        public
+        payable
+    {
+        Bounty newBounty = new Bounty(request, deadline, msg.sender);
+        bounties.push(msg.sender);
         numBounties += 1;
-        (bool sent,) = address(newBounty).call{value: msg.value}("");
+
+        (bool sent, ) = address(newBounty).call{value: msg.value}("");
         require(sent, "Failed to send Ether");
     }
-
-    // function bountyStore(uint256 _BountyIndex, string _BountyLink) public {
-    //     Bounty newBounty = BountyArray[_BountyIndex];
-    //     newBounty.store(_BountyNumber);
-    // }
-
-    // function bountyGet(uint _index) public view returns (string) {
-    //     Bounty retrievedBounty = BountyArray[_index];
-    //     return retrievedBounty.retrieve();
-    // }
 }
