@@ -57,7 +57,9 @@ function BountyHomepage ({connectBtnText, chainId}) {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
         const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
-        bounty.stake({value: ethers.utils.parseEther(stake.toString())})
+        const createStake = await bounty.stake({value: ethers.utils.parseEther(stake.toString())})
+        await createStake.wait()
+        window.location.reload()
     }
 
     function body() {

@@ -3,6 +3,7 @@ import ConnectWallet from './ConnectWallet'
 import { useState } from 'react'
 import { ethers } from 'ethers'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
+import { Link } from 'react-router-dom'
 
 const bountyFactoryAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 
@@ -23,7 +24,10 @@ function CreateBounty({connectBtnText, chainId}) {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
         const bountyFactory = new ethers.Contract(bountyFactoryAddress, BountyFactory.abi, signer)
-        await bountyFactory.createBounty(request, timeToDeadline, {value: ethers.utils.parseEther(stake.toString())})
+        const creatingBounty = await bountyFactory.createBounty(request, timeToDeadline, {value: ethers.utils.parseEther(stake.toString())})
+        await creatingBounty.wait()
+        const index = (await bountyFactory.numBounties()).toNumber() - 1
+        window.location.href = "/bounty/"+index;
     }
 
     return (
@@ -49,7 +53,7 @@ function CreateBounty({connectBtnText, chainId}) {
                                 <Form.Label>Amount to stake</Form.Label>
                                 <Form.Control type="number" value={stake} onChange={({target}) => setStake(target.value)}></Form.Control>
                             </Form.Group>
-                            <Button type="submit">Submit</Button>
+                                <Button type="submit">Submit</Button>
                         </Form>
                     </Card.Body>
                 </Card>
