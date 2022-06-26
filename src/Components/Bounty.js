@@ -3,20 +3,17 @@ import ConnectWallet from './ConnectWallet';
 import { useEffect, useState } from 'react'
 import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { useParams } from 'react-router-dom';
 
-const bountyFactoryAddress = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+const bountyFactoryAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 
-function BountyHomepage ({match, connectBtnText, chainId}) {
-// if staked or uploaded video, can see all videos
-// all videos will be separate component
-// need stake button and upload video button
-
+function BountyHomepage ({connectBtnText, chainId}) {
     const [bountyDisplay, setBountyDisplay] = useState(<div></div>)
     const [bountyAddress, setBountyAddress] = useState("")
     const [staking, setStaking] = useState(false)
     const [stake, setStake] = useState(1)
+    const [staked, setStaked] = useState(false)
 
     const {index} = useParams()
 
@@ -34,14 +31,23 @@ function BountyHomepage ({match, connectBtnText, chainId}) {
         const request = (await bounty.request()).toString()
         const balance = parseInt((await bounty.getBalance()).toString()) / (10**18)
 
+        // check if already staked
+        window.ethereum.request({ method: "eth_accounts" })
+        .then(async (accounts) => {
+        if (accounts.length !== 0) {
+            const currentAddress = utils.getAddress(accounts[0]);
+            const stakers = await bounty.getStakers()
+            setStaked(stakers.includes(currentAddress))
+            console.log(stakers)
+        }
+        })
+        
         setBountyDisplay(
-                <Card.Body>
-                    <Card.Title>
-                        {request}
-                    </Card.Title>
-                    <div><strong>Deadline: </strong>{deadline}</div>
-                    <div><strong>Current Stake: </strong>{balance} ETH</div>
-                </Card.Body>
+            <div>
+                <h1>{request}</h1>
+                <div><strong>Deadline: </strong>{deadline}</div>
+                <div><strong>Current Stake: </strong>{balance} ETH</div>
+            </div>
         )
     }
 
@@ -55,7 +61,15 @@ function BountyHomepage ({match, connectBtnText, chainId}) {
     }
 
     function body() {
-        if (staking) {
+        if (staked) {
+            return (
+                <div>
+                    <h3>Already staked!</h3>
+                    <p>Here are all the videos</p>
+                </div>
+            )
+        }
+        else if (staking) {
             return (
             <Form onSubmit={onSubmitForm}>
                 <Form.Group className="mb-3" controlId="request">
@@ -90,7 +104,6 @@ function BountyHomepage ({match, connectBtnText, chainId}) {
             </ConnectWallet>
         </Container>
     )
-
-
 }
+
 export default BountyHomepage;
