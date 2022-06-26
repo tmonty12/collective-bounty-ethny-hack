@@ -1,7 +1,18 @@
 import { Button, Container, Navbar, Nav } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
 
 function Menu({connectBtnText, setConnectBtnText}) {
+  function checkIfAccountIsConnected() {
+    window.ethereum.request({ method: "eth_accounts" })
+    .then(async (accounts) => {
+      if (accounts.length !== 0) {
+        setConnectBtnText(accounts[0].slice(0,10) + '...')
+      }
+    })
+    .catch((err) => console.log(err));
+  }
+
   function requestAccount() {
     window.ethereum.request({ method: 'eth_requestAccounts' })
       .then(async (accounts) => {
@@ -14,10 +25,14 @@ function Menu({connectBtnText, setConnectBtnText}) {
     if (connectBtnText !== 'Connect Wallet') {
       return (
       <Link to ="/bounty/create" className="nav-link" >
-        <Button onClick={requestAccount}>Create Bounty</Button>
+        <Button>Create Bounty</Button>
       </Link>);
     }
   }
+
+  useEffect(() => {
+    checkIfAccountIsConnected();
+  }, [])
 
   return (
     <>
