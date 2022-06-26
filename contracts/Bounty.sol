@@ -104,6 +104,10 @@ contract Bounty {
         return minStakeAmount;
     }
 
+    function getVideo(uint256 index) public view returns (videoInfo memory) {
+        return videos[index];
+    }
+
     // Returns videos associated with bounty
     function getVideos() public view returns (videoInfo[] memory) {
         return videos;
@@ -141,6 +145,7 @@ contract Bounty {
             "You do not have the ability to vote on this!"
         );
         voterAddresses[msg.sender] = false;
+        videos[idx].voterAddresses.push(msg.sender);
         votes[idx] = votes[idx] + 1;
 
         if (votes[idx] > highestCount) {

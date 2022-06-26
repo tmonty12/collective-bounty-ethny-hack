@@ -13,7 +13,7 @@ contract BountyFactory {
         payable
     {
         Bounty newBounty = new Bounty(request, deadline, msg.sender);
-        bounties.push(msg.sender);
+        bounties.push(address(newBounty));
         numBounties += 1;
 
         (bool sent, ) = address(newBounty).call{value: msg.value}("");
