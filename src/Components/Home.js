@@ -1,29 +1,58 @@
 import ConnectWallet from './ConnectWallet'
-import Container from 'react-bootstrap/Container'
 import BountyHomepage from './Bounty'
+import { Container, Card } from 'react-bootstrap'
 import { ethers } from 'ethers'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
-import { Button } from 'react-bootstrap'
+import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 const bountyFactoryAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 
 function Home({ connectBtnText, chainId }) {
-    const getBounty = async () => {
+    const [bounties, setBounties] = useState([])
+
+    const getBounties = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
         const bountyFactory = new ethers.Contract(bountyFactoryAddress, BountyFactory.abi, signer)
         const numBounties = (await bountyFactory.numBounties()).toNumber()
-        console.log(numBounties)
-        // const bountyAddresses = (await bountyFactory.bounties(0))
-        // console.log(bountyAddresses)
+        let bounties = []
+        for (let i=0; i < numBounties; i++) {
+            const bountyAddress = await bountyFactory.bounties(i)
+            const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
+            let deadline = (await bounty.deadline()).toNumber()
+            const options = { day: '2-digit', year: 'numeric', month: '2-digit', hour:'2-digit', minute: '2-digit'}
+            deadline = (new Date(deadline*1000)).toLocaleDateString('en-US', options)
+            const request = (await bounty.request()).toString()
+            const balance = parseInt((await bounty.getBalance()).toString()) / (10**18)
+
+            bounties.push(
+                <Link to={`/bounty/${i}`} style={{ textDecoration: 'none', color: 'black'}}>
+                    <Card style={{ marginTop: '20px' }}>
+                        <Card.Body>
+                            <Card.Title>
+                                {request}
+                            </Card.Title>
+                            <div><strong>Deadline: </strong>{deadline}</div>
+                            <div><strong>Current Stake: </strong>{balance} ETH</div>
+                        </Card.Body>
+                    </Card>
+                </Link>
+            )
+        }
+        setBounties(bounties)
     }
+
+    useEffect(() => {
+        getBounties()
+    }, [])
 
     return (
         <Container>
             <ConnectWallet connectBtnText={connectBtnText} chainId={chainId}>
-                <div>Welcome Home</div>
-                <Button onClick={getBounty}>Get Bounties</Button>
-            <BountyHomepage bountyAddress="0xa16E02E87b7454126E5E10d957A927A7F5B5d2be" connectBtnText={connectBtnText} chainId={chainId} />
+                <h1>All Open Bounties</h1>
+                {bounties}
             </ConnectWallet>
         </Container>
     )

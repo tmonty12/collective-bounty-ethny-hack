@@ -13,6 +13,10 @@ function Menu({connectBtnText, setConnectBtnText}) {
     .catch((err) => console.log(err));
   }
 
+  useEffect(() => {
+    requestAccount()
+  }, [])
+  
   function requestAccount() {
     window.ethereum.request({ method: 'eth_requestAccounts' })
       .then(async (accounts) => {
