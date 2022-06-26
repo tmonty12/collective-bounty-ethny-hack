@@ -27,7 +27,7 @@ function Home({ connectBtnText, chainId }) {
             const balance = parseInt((await bounty.getBalance()).toString()) / (10**18)
 
             bounties.push(
-                <Link to={`/bounty/${i}`} style={{ textDecoration: 'none', color: 'black'}}>
+                <Link to={`/bounty/${i}`} style={{ textDecoration: 'none', color: 'black'}} key={i}>
                     <Card style={{ marginTop: '20px' }}>
                         <Card.Body>
                             <Card.Title>

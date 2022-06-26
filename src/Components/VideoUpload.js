@@ -5,6 +5,7 @@ import { ethers } from 'ethers'
 import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
 import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import { useEffect, useState } from 'react'
+import { getUploadUrl, uploadVideo } from '../livepeer.js'
 
 const bountyFactoryAddress = '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
 
@@ -31,8 +32,19 @@ function VideoUpload({ connectBtnText, chainId }){
         setSelectedVideo(e.target.files[0])
     }
 
-    const onSubmitForm = (e) => {
+    const onSubmitForm = async (e) => {
         e.preventDefault()
+        
+        // getUploadUrl()
+        //     .then(data => {
+        //         const formData = new FormData()
+        //         formData.append('inputFile', selectedVideo)
+
+        //         uploadVideo(data.url, formData)
+        //             .then(data => {
+        //                 console.log(data); // JSON data parsed by `data.json()` call
+        //             });
+        // });
 
         console.log(selectedVideo)
     }
