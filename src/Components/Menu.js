@@ -43,7 +43,7 @@ function Menu({connectBtnText, setConnectBtnText}) {
       <Navbar bg="light" variant="light">
         <Container>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <Navbar.Brand>Name here</Navbar.Brand>
+            <Navbar.Brand>MakersPool</Navbar.Brand>
           </Link>
           <Nav>
             {createBountyButton()}
