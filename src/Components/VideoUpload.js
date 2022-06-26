@@ -7,7 +7,7 @@ import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import { useEffect, useState } from 'react'
 import { getUploadUrl, uploadVideo } from '../livepeer.js'
 
-const bountyFactoryAddress = '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
+const bountyFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
 
 function VideoUpload({ connectBtnText, chainId }){
     const { id } = useParams()

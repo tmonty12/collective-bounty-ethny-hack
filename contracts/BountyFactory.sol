@@ -8,12 +8,9 @@ contract BountyFactory {
     address[] public bounties;
     uint public numBounties = 0;
 
-    function createBounty(string calldata request, uint deadline)
-        public
-        payable
-    {
+    function createBounty(string calldata request, uint deadline) public payable {
         Bounty newBounty = new Bounty(request, deadline, msg.sender);
-        bounties.push(msg.sender);
+        bounties.push(address(newBounty));
         numBounties += 1;
 
         (bool sent, ) = address(newBounty).call{value: msg.value}("");
