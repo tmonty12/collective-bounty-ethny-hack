@@ -8,7 +8,7 @@ import { ethers, utils } from 'ethers';
 import { useParams } from 'react-router-dom';
 import VideoUpload from './VideoUpload';
 
-const bountyFactoryAddress = '0x9A676e781A523b5d0C0e43731313A708CB607508'
+const bountyFactoryAddress = '0x2DAa635a02C92E40453157e946269ac43376DF2f'
 
 function BountyHomepage({ connectBtnText, chainId }) {
     const [bountyDisplay, setBountyDisplay] = useState(<div></div>)
@@ -18,8 +18,8 @@ function BountyHomepage({ connectBtnText, chainId }) {
     const [staked, setStaked] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [uploaded, setUploaded] = useState(false)
-    const [link, setLink] = useState("")
     const [deadline, setDeadline] = useState("")
+    const [executed, setExecuted] = useState(false)
 
     const {index} = useParams()
 
@@ -37,6 +37,7 @@ function BountyHomepage({ connectBtnText, chainId }) {
         deadline = (new Date(deadline*1000)).toLocaleDateString('en-US', options)
         const request = (await bounty.request()).toString()
         const balance = parseInt((await bounty.getBalance()).toString()) / (10**18)
+        // setExecuted(await bounty.executed())
 
         // check if already staked
         window.ethereum.request({ method: "eth_accounts" })
@@ -67,7 +68,7 @@ function BountyHomepage({ connectBtnText, chainId }) {
             <div>
                 <h1>{request}</h1>
                 <div><strong>Deadline: </strong>{deadline}</div>
-                <div><strong>Current Stake: </strong>{balance} ETH</div>
+                <div><strong>Current Stake: </strong>{balance} MATIC</div>
             </div>
         )
     }
@@ -91,6 +92,10 @@ function BountyHomepage({ connectBtnText, chainId }) {
         await tallyVotes.wait()
         window.location.href = "/"
     }
+
+    // const executeButton = {
+    //     <Button onClick={executeContract}>Execute Contract</Button>
+    // }
 
     function body() {
         const pastDeadline = Date.now() > deadline

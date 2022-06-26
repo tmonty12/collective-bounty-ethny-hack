@@ -7,7 +7,7 @@ import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-const bountyFactoryAddress = '0x9A676e781A523b5d0C0e43731313A708CB607508'
+const bountyFactoryAddress = '0x2DAa635a02C92E40453157e946269ac43376DF2f'
 
 function Home({ connectBtnText, chainId }) {
     const [bounties, setBounties] = useState([])
@@ -36,7 +36,7 @@ function Home({ connectBtnText, chainId }) {
                                 {request}
                             </Card.Title>
                             <div><strong>Deadline: </strong>{deadline}</div>
-                            <div><strong>Current Stake: </strong>{balance} ETH</div>
+                            <div><strong>Current Stake: </strong>{balance} MATIC</div>
                         </Card.Body>
                     </Card>
                 </Link>

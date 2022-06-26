@@ -1,7 +1,6 @@
 import Home from './Components/Home.js'
 import Menu from './Components/Menu.js'
 import CreateBounty from './Components/CreateBounty.js'
-import VideoUpload from './Components/VideoUpload.js'
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import BountyHomepage from './Components/Bounty.js';

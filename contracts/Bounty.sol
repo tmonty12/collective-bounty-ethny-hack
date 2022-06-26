@@ -12,6 +12,7 @@ contract Bounty {
     uint256 minStakeAmount = 0;
     string public request;
     uint public deadline;
+    bool public executed = false;
 
     // Video Address/String -> Struct of Video Information - for Vote Addresses
     // Staked Address -> Amount Staked
@@ -70,6 +71,7 @@ contract Bounty {
             "This bounty is still ongoing. Please try after the deadline has passed."
         );
 
+        executed = true;
         winnerAddr = videos[winningIdx].submissionAddr;
         payable(winnerAddr).transfer(address(this).balance);
     }
