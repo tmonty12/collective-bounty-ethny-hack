@@ -19,7 +19,7 @@ contract Bounty {
     mapping(address => bool) public voterAddresses;
     // money sent to creator address
     address winnerAddr = 0x09FD51F989179a4B04d318F8ae76CFD22c447515;
-
+    address originalStakingAddr;
     uint256 winningIdx;
     bool winnerAssigned = false;
 
@@ -27,7 +27,6 @@ contract Bounty {
     uint256 highestCount = 0;
 
     uint256[] public votes;
-
     // ID for each video is index in videos array
     struct videoInfo {
         address[] voterAddresses;
@@ -35,22 +34,34 @@ contract Bounty {
         string assetLink;
     }
 
-    constructor(string memory _request, uint _deadlineTime) {
+    constructor(
+        string memory _request,
+        uint _deadlineTime,
+        address _stakingAddr
+    ) {
         request = _request;
-        // Used to calculate when payment withdraw for winning
         deadline = block.timestamp + _deadlineTime;
+        originalStakingAddr = _stakingAddr;
+        stake();
     }
 
     function stake() public payable {
-        // msg.value == staked amount, need to convert this to minstake
-        require(
-            msg.value >= minStakeAmount,
-            "You must stake atleast the original stake in order to join this bounty!"
-        );
-        stakers.push(msg.sender);
-        addressToAmount[msg.sender] = msg.value;
-        voterAddresses[msg.sender] = true;
-        minStakeAmount = msg.value;
+        if (stakers.length == 0) {
+            stakers.push(originalStakingAddr);
+            addressToAmount[originalStakingAddr] = msg.value;
+            voterAddresses[originalStakingAddr] = true;
+            minStakeAmount = msg.value;
+        } else {
+            // msg.value == staked amount, need to convert this to minstake
+            require(
+                msg.value >= minStakeAmount,
+                "You must stake atleast the original stake in order to join this bounty!"
+            );
+            stakers.push(msg.sender);
+            addressToAmount[msg.sender] = msg.value;
+            voterAddresses[msg.sender] = true;
+            minStakeAmount = msg.value;
+        }
     }
 
     function withdraw() public payable {
