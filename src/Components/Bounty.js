@@ -7,11 +7,6 @@ import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactor
 import { ethers, utils } from 'ethers';
 import { useParams } from 'react-router-dom';
 
-const bountyFactoryAddress = '0x610178dA211FEF7D417bC0e6FeD39F05609AD788'
-
-function BountyHomepage ({connectBtnText, chainId}) {
-    const [bountyDisplay, setBountyDisplay] = useState(<div></div>)
-    const [bountyAddress, setBountyAddress] = useState("")
     const [staking, setStaking] = useState(false)
     const [stake, setStake] = useState(1)
     const [staked, setStaked] = useState(false)

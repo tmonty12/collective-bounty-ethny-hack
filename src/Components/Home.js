@@ -7,7 +7,7 @@ import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-const bountyFactoryAddress = '0x610178dA211FEF7D417bC0e6FeD39F05609AD788'
+const bountyFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
 
 function Home({ connectBtnText, chainId }) {
     const [bounties, setBounties] = useState([])
@@ -20,6 +20,7 @@ function Home({ connectBtnText, chainId }) {
         let bounties = []
         for (let i=0; i < numBounties; i++) {
             const bountyAddress = await bountyFactory.bounties(i)
+            console.log(bountyAddress)
             const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
             let deadline = (await bounty.deadline()).toNumber()
             const options = { day: '2-digit', year: 'numeric', month: '2-digit', hour:'2-digit', minute: '2-digit'}
@@ -28,7 +29,7 @@ function Home({ connectBtnText, chainId }) {
             const balance = parseInt((await bounty.getBalance()).toString()) / (10**18)
 
             bounties.push(
-                <Link to={`/bounty/${i}`} style={{ textDecoration: 'none', color: 'black'}}>
+                <Link to={`/bounty/${i}`} style={{ textDecoration: 'none', color: 'black'}} key={i}>
                     <Card style={{ marginTop: '20px' }}>
                         <Card.Body>
                             <Card.Title>
