@@ -18,6 +18,7 @@ function BountyHomepage ({connectBtnText, chainId}) {
     const [uploading, setUploading] = useState(false)
     const [uploaded, setUploaded] = useState(false)
     const [link, setLink] = useState("")
+    const [deadline, setDeadline] = useState("")
 
     const {index} = useParams()
 
@@ -31,6 +32,7 @@ function BountyHomepage ({connectBtnText, chainId}) {
         const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
         let deadline = (await bounty.deadline()).toNumber()
         const options = { day: '2-digit', year: 'numeric', month: '2-digit', hour:'2-digit', minute: '2-digit'}
+        setDeadline(new Date(deadline*1000))
         deadline = (new Date(deadline*1000)).toLocaleDateString('en-US', options)
         const request = (await bounty.request()).toString()
         const balance = parseInt((await bounty.getBalance()).toString()) / (10**18)
@@ -88,16 +90,25 @@ function BountyHomepage ({connectBtnText, chainId}) {
         const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
         const createVideo = await bounty.upload(link)
         await createVideo.wait()
-        setUploaded(true)
-        // window.location.reload()
+        window.location.reload()
+    }
+
+    const executeContract = async() => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
+        const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
+        const tallyVotes = await bounty.tallyVotes()
+        await tallyVotes.wait()
+        window.location.href = "/"
     }
 
     function body() {
+        const pastDeadline = Date.now() > deadline
         if (staked) {
             return (
                 <div>
-                    <h3>Already staked!</h3>
-                    <p>Here are all the videos</p>
+                    <h3>Submitted Videos</h3>
+                    {pastDeadline && <Button onClick={executeContract}>Execute Contract</Button>}
                     <Videos bountyAddress={bountyAddress} />
                 </div>
             )
