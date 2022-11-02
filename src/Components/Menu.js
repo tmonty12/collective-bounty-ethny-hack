@@ -29,7 +29,7 @@ function Menu({connectBtnText, setConnectBtnText}) {
     if (connectBtnText !== 'Connect Wallet') {
       return (
       <Link to ="/bounty/create" className="nav-link" >
-        <Button>Create Bounty</Button>
+        <Button variant="light">Create Bounty</Button>
       </Link>);
     }
   }
@@ -40,15 +40,15 @@ function Menu({connectBtnText, setConnectBtnText}) {
 
   return (
     <>
-      <Navbar bg="light" variant="light">
+      <Navbar bg="primary" variant="dark">
         <Container>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <Navbar.Brand>MakersPool</Navbar.Brand>
+            <Navbar.Brand style={{ color: 'white' }}>MakersPool</Navbar.Brand>
           </Link>
           <Nav>
             {createBountyButton()}
             <Nav.Link>
-              <Button onClick={requestAccount}>{connectBtnText}</Button>
+              <Button onClick={requestAccount} variant="light">{connectBtnText}</Button>
             </Nav.Link>
           </Nav>
         </Container>

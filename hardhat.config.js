@@ -13,6 +13,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+require('dotenv').config()
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -24,6 +25,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   networks: {
     hardhat: {
       chainId: 1337
+    },
+    goerli: {
+      url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: [process.env.PRIVATE_KEY]
     }
   }
 };

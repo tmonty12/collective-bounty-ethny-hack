@@ -21,25 +21,27 @@ function Videos({ bountyAddress }) {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
         const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
-        const videoObjects = await bounty.getVideos()
-        console.log(videoObjects)
+        const numVideos = (await bounty.getNumVideos())
         let videos = []
         let voted = false
-        for (let i=0; i < videoObjects.length; i++) {
-            await window.ethereum.request({ method: "eth_accounts" })
-            .then(async (accounts) => {
-            if (accounts.length !== 0) {
-                const currentAddress = utils.getAddress(accounts[0]);
-                const voters = videoObjects[i].voterAddresses
-                voted = voters.includes(currentAddress)
-                setHasVoted(true)
-            }
-            })
+        for (let i=0; i < numVideos; i++) {
+            const video = await bounty.videos(i)
+            // await window.ethereum.request({ method: "eth_accounts" })
+            // .then(async (accounts) => {
+            // if (accounts.length !== 0) {
+            //     const currentAddress = utils.getAddress(accounts[0]);
+                
+            //     const voters = video.voterAddresses
+
+            //     voted = voters.includes(currentAddress)
+            //     setHasVoted(true)
+            // }
+            // })
             videos.push(
                 <Card style={{ marginTop: '20px' }}>
                     <Card.Body>
                         <Card.Title>
-                            <a href={videoObjects[i].assetLink}>{videoObjects[i].assetLink}</a>
+                            <a href={video.videoUrl}>{video.videoUrl}</a>
                         </Card.Title>
                         {voted && <Badge bg="success">Voted</Badge>}
                         {!voted && hasVoted && <div>You have already voted for another video.</div>}

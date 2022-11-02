@@ -1,0 +1,15 @@
+.bounty-card {
+    width: 45%;
+    float: left;
+    margin-top: 20px;
+    margin-right: 5%;
+}
+
+.bounty-card a {
+    text-decoration: none;
+    color: black;
+}
+
+.bounty-card a:hover {
+    color: #040494;
+}

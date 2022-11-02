@@ -1,42 +1,145 @@
-// https://livepeer.studio/api/
-//   "downloadUrl": "https://livepeercdn.com/asset/c20c1cuq37gzlns5/video"
-// 16d0petgxq5od50q video id
-import axios from 'axios'
-import React from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Container, Card, Form, Button, Spinner } from 'react-bootstrap'
+import ConnectWallet from './ConnectWallet'
+import { ethers, utils } from 'ethers' 
+import BountyFactory from '../artifacts/contracts/BountyFactory.sol/BountyFactory.json'
+import Bounty from '../artifacts/contracts/Bounty.sol/Bounty.json'
+import { useEffect, useState } from 'react'
+import { getUploadUrl, uploadVideo, retrieveAsset } from '../livepeer.js'
+import { sleep } from '../utils.js'
 
-// POST /api/asset/request-upload
+const bountyFactoryAddress = process.env.REACT_APP_BOUNTY_FACTORY_ADDRESS
 
-const api_key = '79478b6f-3166-455e-b837-96f73c95e396';
+function Upload({ connectBtnText, chainId }){
+    const [selectedVideo, setSelectedVideo ] = useState('')
+    const [hasSubmitted, setHasSubmitted] = useState(false)
+    const [isUploading, setIsUploading] = useState(false)
+    const [bounty, setBounty] = useState(null)
+    const [title, setTitle] = useState('')
+    const [bountyDNE, setBountyDNE] = useState(false)
+    const {index} = useParams()
+    const navigate = useNavigate()
 
-const baseURL = "https://livepeer.studio/api/asset/import";
-const uploadURL = "https://origin.livepeer.com/api/asset/upload/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmVzaWduZWRVcmwiOiJodHRwczovL3N0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vbHAtdXMtdm9kLWNvbS9kaXJlY3RVcGxvYWQvMTZkMHBldGd4cTVvZDUwcS9zb3VyY2U_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ29udGVudC1TaGEyNTY9VU5TSUdORUQtUEFZTE9BRCZYLUFtei1DcmVkZW50aWFsPUdPT0cxRVlVTldOVjZSWUlLNTQySFdBM1JMN1JCN0pVT0VRM1lMMjNRWUI2Q0hQRzVITzJRQzMzTUpWVVklMkYyMDIyMDYyNiUyRnVzJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDIyMDYyNlQwMzI1MzFaJlgtQW16LUV4cGlyZXM9OTAwJlgtQW16LVNpZ25hdHVyZT0yYmU1ZWE1YTEzMzRmZjUxZjI4MDA0NDRiY2Y0NzIzZDVhZWVhZjAwMDhlNThjYTZmZTQxYjgzYjhlMWIwOWExJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZ4LWlkPVB1dE9iamVjdCIsImF1ZCI6Imh0dHBzOi8vbGl2ZXBlZXIuY29tIiwiaWF0IjoxNjU2MjEzOTMyfQ.0SDrtVogNkghxd7-XdJTq3IRMDFRwhA6OUs3tBqEQB0";
+    const handleFileInput = (e) => {
+        setSelectedVideo(e.target.files[0])
+    }
 
-export default function App() {
-  const [uploadFile, setUploadFile] = React.useState();
-  const [superHero, setSuperHero] = React.useState();
-  
-  const submitForm = (event) => {
-    event.preventDefault();
+    const checkBountyExists = async () =>{
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
+        const bountyFactory = new ethers.Contract(bountyFactoryAddress, BountyFactory.abi, signer)
 
-    const dataArray = new FormData();
-    // dataArray.append("superHeroName", superHero);
-    dataArray.append("file", uploadFile);
+        if (index < 0 || index >= (await bountyFactory.getNumBounties()).toNumber()){
+            setBountyDNE(true)
+        }
+    }
 
-    fetch(uploadURL, {
-      method: 'PUT',
-      headers:{
-      Authorization: `Bearer ${api_key}`,
-      'Content-Type':'video/mp4'
-      },
-      body: uploadFile
-    })
-    .then((response) => {
-      // successfully uploaded response
-      console.log(response)
-    })
-    .catch((error) => {
-      // error response
-      console.log('failed')
-    });
-  }
+    useEffect(() => {
+        checkBountyExists()
+        // check if already submitted video
+        window.ethereum.request({ method: "eth_accounts" }).then(async (accounts) => {
+            if (accounts.length !== 0) {
+                const currentAddress = utils.getAddress(accounts[0]);
+                const provider = new ethers.providers.Web3Provider(window.ethereum)
+                const signer = provider.getSigner()
+                const bountyFactory = new ethers.Contract(bountyFactoryAddress, BountyFactory.abi, signer)
+                const bountyAddress = await bountyFactory.bounties(index)
+                const bounty = new ethers.Contract(bountyAddress, Bounty.abi, signer)
+                setBounty(bounty)
+                setHasSubmitted(parseInt((await bounty.videoSubmissions(currentAddress))) === 1)
+            }
+        })
+    }, [])
+
+    const onSubmitForm = async (e) => {
+        e.preventDefault()
+
+        if (hasSubmitted === false) {
+            await getUploadUrl(title)
+            .then(async data => {
+                const assetId = data.asset.id
+                const createVideo = await bounty.uploadVideo(assetId, title)
+                await createVideo.wait()
+                
+                
+                setIsUploading(true)
+                uploadVideo(data.url, selectedVideo)
+                    .then(async data => {
+                        let doneUploading = false
+                        while (!doneUploading) {
+                            const res = await retrieveAsset(assetId);
+                            if (res.status.phase === 'ready') {
+                                doneUploading = true;
+                            }
+                            await sleep(1000)
+                        }
+                        navigate(`/bounty/${index}`, {replace: true })
+                    })
+            });
+        }
+    }
+
+    const renderBody = () => {
+        if (bountyDNE) {
+            return  (
+                <div style={{ textAlign: 'center', marginTop: '40px'}}>
+                    <h1>Bounty does not exist</h1>
+                    <span className="material-symbols-outlined" style={{ fontSize: '50px', color:'grey'}}>block</span>
+                </div>
+            )
+        } else if (hasSubmitted) {
+            return  (
+                <div style={{ textAlign: 'center', marginTop: '40px'}}>
+                    <h1>You have already submitted a video</h1>
+                </div>
+            )
+        } else if (isUploading) {
+            return  (
+                <div style={{ textAlign: 'center', marginTop: '40px'}}>
+                    <Spinner animation='border' role='status'>
+                        <span className='visually-hidden'>Loading...</span>
+                    </Spinner>
+                </div>
+            )
+        } else {
+            return (
+                    <Card style={{ marginTop: '20px' }}>
+                        <Card.Body>
+                            <Card.Title>Video Upload</Card.Title>
+                            <Form onSubmit={onSubmitForm}>
+                                <Form.Group className="mb-3" controlId="request">
+                                    <Form.Label>Title</Form.Label>
+                                    <Form.Control type="text" value={title} onChange={({target}) => setTitle(target.value)}></Form.Control>
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="request">
+                                    <Form.Control type="file" onChange={handleFileInput}></Form.Control>
+                                </Form.Group>
+                                <Button type="submit" onSubmit={onSubmitForm}>Submit</Button>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+            )
+        }
+    }
+
+    const renderBackButton = () => {
+        if (isUploading || bountyDNE || hasSubmitted) {
+            return <></>
+        } else {
+            return <Button onClick={() => navigate(-1)}><span className="material-symbols-outlined">arrow_back</span></Button>
+        }
+    }
+
+    return (
+        <Container>
+            <div style={{ display: 'flex', justifyContent: 'center'}}>
+                <ConnectWallet connectBtnText={connectBtnText} chainId={chainId}>
+                    {renderBody()}  
+                </ConnectWallet>
+            </div>
+            {renderBackButton()}
+        </Container>
+    )
 }
+
+export default Upload;
